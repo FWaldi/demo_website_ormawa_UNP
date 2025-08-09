@@ -1,0 +1,63 @@
+# Nama alur kerja yang akan muncul di tab Actions di GitHub
+name: Deploy Static Frontend to GitHub Pages
+
+# Pemicu: Alur kerja ini akan berjalan setiap kali ada push ke cabang 'main'
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: # Memungkinkan untuk menjalankan alur kerja ini secara manual
+
+# Izin yang diperlukan agar alur kerja dapat membaca repositori dan menulis ke GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Konkurensi: Memastikan hanya satu deployment yang berjalan pada satu waktu untuk grup 'pages'
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+# Pekerjaan (Jobs): Mendefinisikan serangkaian tugas yang akan dieksekusi
+jobs:
+  build:
+    runs-on: ubuntu-latest # Menentukan bahwa pekerjaan ini berjalan di mesin virtual Ubuntu terbaru
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # Mengunduh kode repositori Anda ke runner
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4 # Mengatur lingkungan Node.js
+        with:
+          node-version: "20" # Tentukan versi Node.js yang sesuai dengan proyek Anda
+          cache: 'npm' # Mengaktifkan caching untuk dependensi npm
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5 # Mengonfigurasi lingkungan untuk GitHub Pages
+
+      - name: Install dependencies
+        run: npm install # Menginstal semua dependensi proyek dari package.json
+
+      - name: Build static site
+        run: npm run build # Menjalankan skrip build, yang akan menghasilkan folder 'out'
+
+      - name: Create .nojekyll file
+        run: touch out/.nojekyll # Membuat file .nojekyll untuk menonaktifkan pemrosesan Jekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3 # Mengunggah hasil build (folder 'out') sebagai artefak
+        with:
+          path: './out'
+
+  deploy:
+    needs: build # Pekerjaan ini hanya akan berjalan setelah pekerjaan 'build' berhasil
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # URL situs yang dideploy
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # Mendeploy artefak yang diunggah ke GitHub Pages
