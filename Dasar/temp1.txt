@@ -1,0 +1,253 @@
+saya ingin anda melakukan hal berikut agar project ini dapat di     │    
+│    deploy ke internet, tetapi saya juga inign menyimpan state lama,    │    
+│    karean semua perubahan yang akan terjadi bukan dari developing      │    
+│    project ini, ini hanya untuk demo, deploy ke internet. Bagian I:    │    
+│    Menghasilkan dan Mendeploy Pratinjau Frontend Statis ke GitHub      │    
+│    Pages                                                               │    
+│    Bagian ini merinci proses untuk mengubah frontend Next.js Anda      │    
+│    menjadi kumpulan file statis dan mendeploynya secara otomatis ke    │    
+│    GitHub Pages. Metode ini sangat baik untuk membuat pratinjau UI     │    
+│    interaktif dari bagian publik situs Anda. Perlu ditekankan kembali  │    
+│    bahwa dalam mode ini, backend, database, dan fungsionalitas sisi    │    
+│    server lainnya seperti otentikasi admin tidak akan berfungsi.       │    
+│                                                                        │    
+│    Menyesuaikan Aplikasi Next.js Anda untuk Ekspor Statis              │    
+│    Langkah pertama adalah mengonfigurasi aplikasi Next.js Anda untuk   │    
+│    menghasilkan output statis. Ini melibatkan modifikasi file          │    
+│    next.config.mjs untuk mengaktifkan mode ekspor dan menangani        │    
+│    persyaratan spesifik dari hosting di GitHub Pages.                  │    
+│                                                                        │    
+│    Mengonfigurasi next.config.mjs                                      │    
+│    File konfigurasi Next.js Anda harus diperbarui untuk menyertakan    │    
+│    beberapa opsi penting yang memungkinkan ekspor statis dan           │    
+│    memastikan aset dimuat dengan benar saat di-hosting di              │    
+│    sub-direktori, yang merupakan perilaku default untuk repositori     │    
+│    proyek di GitHub Pages.                                             │    
+│                                                                        │    
+│    output: 'export': Opsi ini adalah kunci utama untuk mengaktifkan    │    
+│    ekspor statis. Ini menginstruksikan Next.js untuk menghasilkan      │    
+│    situs HTML/CSS/JS yang sepenuhnya statis ke dalam direktori out/    │    
+│    saat menjalankan perintah next build. Ini adalah pengganti modern   │    
+│    untuk perintah next export yang sudah tidak digunakan lagi.         │    
+│                                                                        │    
+│    basePath dan assetPrefix: Konfigurasi ini sangat penting untuk      │    
+│    deployment di GitHub Pages. GitHub Pages menayangkan situs proyek   │    
+│    dari sub-direktori, bukan dari root domain (misalnya,               │    
+│    https://<user>.github.io/<repo-name>). Tanpa konfigurasi ini,       │    
+│    aplikasi Anda akan mencoba memuat aset (seperti file JavaScript,    │    
+│    CSS, dan gambar) dari root domain, yang akan mengakibatkan          │    
+│    kesalahan 404.                                                      │    
+│                                                                        │    
+│    basePath menambahkan nama repositori Anda (misalnya,                │    
+│    /website_ormawa_unp_1-2) ke semua rute internal yang dikelola oleh  │    
+│    Next.js Router.                                                     │    
+│                                                                        │    
+│    assetPrefix melakukan hal yang sama untuk semua permintaan aset     │    
+│    statis. Mengaturnya ke nilai yang sama dengan basePath memastikan   │    
+│    konsistensi.                                                        │    
+│                                                                        │    
+│    images: { unoptimized: true }: Pengoptimalan gambar default Next.js │    
+│     (next/image) memerlukan server Next.js yang sedang berjalan untuk  │    
+│    memproses gambar secara dinamis. Karena ekspor statis tidak         │    
+│    memiliki server, fitur ini tidak kompatibel dan akan menyebabkan    │    
+│    kesalahan saat build. Dengan mengatur unoptimized: true, Anda       │    
+│    menginstruksikan next/image untuk menyajikan gambar apa adanya      │    
+│    tanpa pemrosesan, yang memastikan gambar dapat ditampilkan dengan   │    
+│    benar di lingkungan hosting statis seperti GitHub Pages.            │    
+│                                                                        │    
+│    Berikut adalah konten lengkap yang direkomendasikan untuk file      │    
+│    next.config.mjs Anda:                                               │    
+│                                                                        │    
+│    JavaScript                                                          │    
+│                                                                        │    
+│    // next.config.mjs                                                  │    
+│                                                                        │    
+│    /** @type {import('next').NextConfig} */                            │    
+│    const nextConfig = {                                                │    
+│      // Aktifkan mode ekspor statis. Ini akan menghasilkan situs Anda  │    
+│    ke dalam folder 'out'.                                              │    
+│      output: 'export',                                                 │    
+│                                                                        │    
+│      // Atur basePath dan assetPrefix ke nama repositori Anda untuk    │    
+│    deployment di GitHub Pages.                                         │    
+│      // Ini memastikan semua tautan dan aset dimuat dari sub-direktori │    
+│     yang benar.                                                        │    
+│      // Ganti 'website_ormawa_unp_1-2' dengan nama repositori GitHub   │    
+│    Anda.                                                               │    
+│      basePath: '/website_ormawa_unp_1-2',                              │    
+│      assetPrefix: '/website_ormawa_unp_1-2',                           │    
+│                                                                        │    
+│      // Nonaktifkan pengoptimalan gambar bawaan Next.js, karena tidak  │    
+│    didukung                                                            │    
+│      // dalam ekspor statis tanpa server kustom.                       │    
+│      images: {                                                         │    
+│        unoptimized: true,                                              │    
+│      },                                                                │    
+│    };                                                                  │    
+│                                                                        │    
+│    export default nextConfig;                                          │    
+│    Peringatan Proaktif: Menangani Rute Dinamis                         │    
+│    Proyek Anda kemungkinan besar akan memiliki rute dinamis (misalnya, │    
+│     [slug].tsx untuk menampilkan detail berita atau profil ormawa).    │    
+│    Dalam mode output: 'export', Next.js perlu mengetahui semua         │    
+│    kemungkinan jalur untuk rute dinamis ini pada saat build untuk      │    
+│    menghasilkan file HTML yang sesuai. Jika tidak, proses build akan   │    
+│    gagal dengan kesalahan yang menyatakan bahwa generateStaticParams   │    
+│    (untuk App Router) atau getStaticPaths (untuk Pages Router) tidak   │    
+│    ditemukan. Anda harus mengimplementasikan fungsi ini di setiap      │    
+│    halaman dinamis Anda, yang mengambil semua slug yang mungkin        │    
+│    (misalnya, dari file lokal atau panggilan API saat build) dan       │    
+│    menyediakannya ke Next.js.                                          │    
+│                                                                        │    
+│    Membuat Alur Kerja GitHub Actions untuk Deployment Otomatis         │    
+│    Untuk mengotomatiskan proses deployment ke GitHub Pages setiap kali │    
+│     Anda melakukan push ke repositori, Anda akan menggunakan GitHub    │    
+│    Actions. Ini adalah praktik CI/CD (Continuous                       │    
+│    Integration/Continuous Deployment) standar yang memastikan situs    │    
+│    Anda selalu terbarui dengan kode terbaru di cabang utama Anda.      │    
+│                                                                        │    
+│    Buat file baru di repositori Anda di lokasi                         │    
+│    .github/workflows/deploy-static.yml dan isi dengan konten berikut.  │    
+│    Setiap langkah dalam file alur kerja ini dijelaskan secara rinci di │    
+│     bawahnya.                                                          │    
+│                                                                        │    
+│    YAML                                                                │    
+│                                                                        │    
+│    # Nama alur kerja yang akan muncul di tab Actions di GitHub         │    
+│    name: Deploy Static Frontend to GitHub Pages                        │    
+│                                                                        │    
+│    # Pemicu: Alur kerja ini akan berjalan setiap kali ada push ke      │    
+│    cabang 'main'                                                       │    
+│    on:                                                                 │    
+│      push:                                                             │    
+│        branches: ["main"]                                              │    
+│      workflow_dispatch: # Memungkinkan untuk menjalankan alur kerja    │    
+│    ini secara manual                                                   │    
+│                                                                        │    
+│    # Izin yang diperlukan agar alur kerja dapat membaca repositori dan │    
+│     menulis ke GitHub Pages                                            │    
+│    permissions:                                                        │    
+│      contents: read                                                    │    
+│      pages: write                                                      │    
+│      id-token: write                                                   │    
+│                                                                        │    
+│    # Konkurensi: Memastikan hanya satu deployment yang berjalan pada   │    
+│    satu waktu untuk grup 'pages'                                       │    
+│    concurrency:                                                        │    
+│      group: "pages"                                                    │    
+│      cancel-in-progress: false                                         │    
+│                                                                        │    
+│    # Pekerjaan (Jobs): Mendefinisikan serangkaian tugas yang akan      │    
+│    dieksekusi                                                          │    
+│    jobs:                                                               │    
+│      build:                                                            │    
+│        runs-on: ubuntu-latest # Menentukan bahwa pekerjaan ini         │    
+│    berjalan di mesin virtual Ubuntu terbaru                            │    
+│                                                                        │    
+│        steps:                                                          │    
+│          - name: Checkout repository                                   │    
+│            uses: actions/checkout@v4 # Mengunduh kode repositori Anda  │    
+│    ke runner                                                           │    
+│                                                                        │    
+│          - name: Setup Node.js                                         │    
+│            uses: actions/setup-node@v4 # Mengatur lingkungan Node.js   │    
+│            with:                                                       │    
+│              node-version: "20" # Tentukan versi Node.js yang sesuai   │    
+│    dengan proyek Anda                                                  │    
+│              cache: 'npm' # Mengaktifkan caching untuk dependensi npm  │    
+│                                                                        │    
+│          - name: Setup Pages                                           │
+│            uses: actions/configure-pages@v5 # Mengonfigurasi           │    
+│    lingkungan untuk GitHub Pages                                       │    
+│                                                                        │    
+│          - name: Install dependencies                                  │    
+│            run: npm install # Menginstal semua dependensi proyek dari  │    
+│    package.json                                                        │    
+│                                                                        │    
+│          - name: Build static site                                     │    
+│            run: npm run build # Menjalankan skrip build, yang akan     │    
+│    menghasilkan folder 'out'                                           │    
+│                                                                        │    
+│          - name: Create.nojekyll file                                  │    
+│            run: touch out/.nojekyll # Membuat file.nojekyll untuk      │    
+│    menonaktifkan pemrosesan Jekyll                                     │    
+│                                                                        │    
+│          - name: Upload artifact                                       │    
+│            uses: actions/upload-pages-artifact@v3 # Mengunggah hasil   │    
+│    build (folder 'out') sebagai artefak                                │    
+│            with:                                                       │    
+│              path: './out'                                             │    
+│                                                                        │    
+│      deploy:                                                           │    
+│        needs: build # Pekerjaan ini hanya akan berjalan setelah        │    
+│    pekerjaan 'build' berhasil                                          │    
+│        runs-on: ubuntu-latest                                          │    
+│        environment:                                                    │    
+│          name: github-pages                                            │    
+│          url: ${{ steps.deployment.outputs.page_url }} # URL situs     │    
+│    yang dideploy                                                       │    
+│                                                                        │    
+│        steps:                                                          │    
+│          - name: Deploy to GitHub Pages                                │    
+│            id: deployment                                              │    
+│            uses: actions/deploy-pages@v4 # Mendeploy artefak yang      │    
+│    diunggah ke GitHub Pages                                            │    
+│    Analisis Langkah-langkah Alur Kerja                                 │    
+│    actions/checkout@v4: Langkah ini adalah standar untuk setiap alur   │    
+│    kerja yang perlu berinteraksi dengan kode repositori. Ini           │    
+│    mengkloning repositori Anda ke dalam mesin virtual (runner) tempat  │    
+│    alur kerja dijalankan.                                              │    
+│                                                                        │    
+│    actions/setup-node@v4: Mengatur versi Node.js yang diperlukan agar  │    
+│    sesuai dengan lingkungan pengembangan lokal Anda, memastikan        │    
+│    konsistensi selama proses build.                                    │    
+│                                                                        │    
+│    actions/configure-pages@v5: Tindakan ini mempersiapkan runner untuk │    
+│     membangun dan mendeploy ke GitHub Pages. Menggunakan versi modern  │    
+│    (v4 atau lebih tinggi) sangat penting karena versi yang lebih lama  │    
+│    diketahui dapat menyebabkan masalah dengan menimpa file             │    
+│    next.config.js secara tidak benar.                                  │    
+│                                                                        │    
+│    npm run build: Perintah ini menjalankan skrip build yang ditentukan │    
+│     dalam package.json Anda. Karena Anda telah mengonfigurasi output:  │    
+│    'export' di next.config.mjs, perintah ini akan menghasilkan situs   │    
+│    statis Anda di dalam direktori out/.                                │    
+│                                                                        │    
+│    touch out/.nojekyll: Ini adalah langkah yang sering terlewatkan     │    
+│    namun krusial. Secara default, GitHub Pages memproses situs melalui │    
+│     Jekyll, sebuah generator situs statis. Jekyll mengabaikan          │    
+│    direktori yang diawali dengan garis bawah (_), seperti direktori    │    
+│    _next/ milik Next.js tempat semua aset penting (JavaScript, CSS)    │    
+│    berada. Dengan membuat file kosong bernama .nojekyll di root        │    
+│    direktori output, Anda memberi tahu GitHub Pages untuk melewati     │    
+│    pemrosesan Jekyll dan menyajikan semua file apa adanya.             │    
+│                                                                        │    
+│    actions/upload-pages-artifact@v3: Setelah build selesai, tindakan   │    
+│    ini mengambil seluruh konten direktori out/ dan mengunggahnya       │    
+│    sebagai artefak bernama github-pages. Artefak ini adalah paket yang │    
+│     siap untuk dideploy.                                               │    
+│                                                                        │    
+│    actions/deploy-pages@v4: Pekerjaan terakhir ini bergantung pada     │    
+│    keberhasilan pekerjaan build. Ini mengambil artefak github-pages    │    
+│    yang diunggah dan mendeploynya ke lingkungan GitHub Pages Anda,     │    
+│    membuat situs Anda dapat diakses secara publik di URL yang          │    
+│    ditentukan.                                                         │    
+│                                                                        │    
+│    Urutan Prompt Gemini CLI untuk Deployment GitHub Pages              │    
+│    Berikut adalah daftar tugas dalam bentuk prompt yang dapat Anda     │    
+│    berikan kepada Gemini CLI untuk menghasilkan artefak yang           │    
+│    dijelaskan di atas secara otomatis.                                 │    
+│                                                                        │    
+│    Prompt 1: Generasi Konfigurasi Next.js                              │    
+│    Prompt ini bertujuan untuk membuat file next.config.mjs yang        │    
+│    dikonfigurasi dengan benar untuk ekspor statis dan hosting di       │    
+│    GitHub Pages.                                                       │    
+│                                                                        │    
+│    Analisis file package.json dan struktur proyek yang terlampir.      │    
+│    Proyek saya adalah aplikasi Next.js. Saya perlu mendeploy ekspor    │    
+│    statis ke GitHub Pages di bawah repositori bernama                  │    
+│    'website_ormawa_unp_1-2'. Hasilkan konten lengkap untuk file        │    
+│    next.config.mjs saya. File tersebut harus menyertakan opsi `output: │    
+│     'export'`, mengonfigurasi `basePath` dan `assetPrefix` dengan      │    
+│    benar untuk repositori tersebut, dan mengatur `images: {            │    
+│    unoptimized: true }` untuk memastikan kompatibilitas.  

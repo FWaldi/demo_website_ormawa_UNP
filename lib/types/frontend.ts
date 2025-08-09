@@ -25,6 +25,7 @@ export interface Ormawa {
     name: string;
     slug: string;
     description: string | null;
+    logo_url: string | null;
     logo_placeholder_color: string;
     // Tambahkan field lain sesuai kebutuhan
 }

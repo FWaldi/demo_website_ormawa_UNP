@@ -1,21 +1,20 @@
-
 // app/ormawa/[slug]/page.tsx
-// Halaman ini akan menjadi sangat kompleks dan akan dikembangkan lebih lanjut.
-// Untuk saat ini, kita buat kerangka dasarnya.
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Typography } from "@/components/ui/typography";
 import { Ormawa } from "@/lib/types/frontend";
 import { notFound } from "next/navigation";
 import { ImagePlaceholder } from "@/components/shared/ImagePlaceholder";
+import { ormawaItems } from "@/lib/placeholder-data"; // Menggunakan data statis
 
-async function getOrmawaDetail(slug: string): Promise<Ormawa | null> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/ormawa/${slug}`, { cache: 'no-store' });
-  if (!res.ok) {
-    if (res.status === 404) return null;
-    throw new Error('Failed to fetch ormawa detail');
-  }
-  return (await res.json()) as Ormawa;
+export async function generateStaticParams() {
+  return ormawaItems.map((ormawa) => ({
+    slug: ormawa.slug,
+  }));
+}
+
+async function getOrmawaDetail(slug: string): Promise<Ormawa | undefined> {
+  return ormawaItems.find((o) => o.slug === slug);
 }
 
 export default async function OrmawaProfilePage({ params }: { params: { slug: string } }) {
@@ -29,11 +28,10 @@ export default async function OrmawaProfilePage({ params }: { params: { slug: st
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        {/* Hero Section for Ormawa */}
         <section className="bg-secondary text-secondary-foreground py-16">
           <div className="container mx-auto flex flex-col md:flex-row items-center gap-8">
             <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden flex-shrink-0">
-              <ImagePlaceholder color={ormawa.logo_placeholder_color} text={ormawa.name.split(" ").map(w => w[0]).join("")} />
+              <ImagePlaceholder text={ormawa.name.substring(0, 2).toUpperCase()} color={ormawa.logo_placeholder_color} />
             </div>
             <div>
               <Typography as="h1" variant="h1">{ormawa.name}</Typography>
@@ -41,11 +39,9 @@ export default async function OrmawaProfilePage({ params }: { params: { slug: st
             </div>
           </div>
         </section>
-
-        {/* Tab Navigation and Content */}
         <section className="container mx-auto py-8">
           <Typography variant="muted" className="text-center">
-            Konten detail untuk setiap tab (Profil, Tentang, Anggota, Kegiatan, Galeri, Jadwal, Kontak) akan diimplementasikan di sini.
+            Konten detail untuk setiap tab akan diimplementasikan di sini.
           </Typography>
         </section>
       </main>

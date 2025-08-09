@@ -62,7 +62,7 @@ export default async function HomePage() {
             <Typography as='h2' variant='h2' className='text-center mb-8'>ORMAWA Unggulan</Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredOrmawa.map((ormawaItem) => (
-                <OrmawaCard key={ormawaItem.id} ormawaItem={ormawaItem} />
+                <OrmawaCard key={ormawaItem.id} ormawa={ormawaItem} />
               ))}
             </div>
              <div className="text-center mt-8">

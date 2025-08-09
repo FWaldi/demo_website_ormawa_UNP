@@ -14,7 +14,7 @@ export default function OrmawaGrid({ ormawaItems }: OrmawaGridProps) {
         {ormawaItems.map((ormawa) => (
           <OrmawaCard
             key={ormawa.id}
-            ormawaItem={ormawa}
+            ormawa={ormawa}
           />
         ))}
       </div>
