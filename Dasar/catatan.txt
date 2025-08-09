@@ -1,8 +1,0 @@
-npm run lint -- --fix
-npm run type-check
-
-npm run dev
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
-
- docker-compose exec backend python seed.py
- docker-compose up --build
