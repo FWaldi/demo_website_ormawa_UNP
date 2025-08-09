@@ -1,0 +1,32 @@
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { eventItems } from '@/lib/placeholder-data';
+import { notFound } from 'next/navigation';
+import Image from 'next/image';
+import { Typography } from '@/components/ui/typography';
+
+export default function EventDetailPage({ params }: { params: { slug: string } }) {
+  const event = eventItems.find(item => item.slug === params.slug);
+
+  if (!event) {
+    notFound();
+  }
+
+  return (
+    <>
+      <Header />
+      <main className="container mx-auto py-8">
+        <div className="max-w-3xl mx-auto">
+          <Typography variant="h1" className="text-center mb-4">{event.title}</Typography>
+          <Typography variant="muted" className="text-center mb-8">{event.date}</Typography>
+          <div className="relative w-full h-64 mb-8">
+            <Image src={event.imageUrl} alt={event.title} layout="fill" objectFit="cover" className="rounded-lg" />
+          </div>
+          <Typography variant="p" className="text-lg leading-relaxed">{event.description}</Typography>
+          {/* Tambahkan detail acara lainnya di sini */}
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}

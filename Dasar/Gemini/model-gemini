@@ -1,0 +1,40 @@
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+
+# Fungsi ini akan memuat variabel dari file .env
+load_dotenv()
+
+print("Mencoba memuat konfigurasi dari file .env...")
+
+# Ambil API key dan nama model dari environment
+api_key = os.getenv("GEMINI_API_KEY")
+model_name = os.getenv("GEMINI_MODEL")
+
+# Periksa apakah variabel berhasil dimuat
+if not api_key:
+    raise ValueError("Variabel GEMINI_API_KEY tidak ditemukan. Pastikan ada di file .env")
+if not model_name:
+    raise ValueError("Variabel GEMINI_MODEL tidak ditemukan. Pastikan ada di file .env")
+
+print(f"✅ Konfigurasi berhasil dimuat. Model yang akan digunakan: {model_name}")
+
+try:
+    # Konfigurasi API key ke library Google
+    genai.configure(api_key=api_key)
+
+    # Inisialisasi model dengan nama yang diambil dari .env
+    model = genai.GenerativeModel(model_name)
+
+    # Kirim prompt ke model
+    print("\nMengirim permintaan ke Gemini...")
+    response = model.generate_content("Ceritakan satu fakta menarik tentang Indonesia.")
+
+    # Cetak hasil jawaban dari Gemini
+    print("\nJawaban dari Gemini:")
+    print("--------------------")
+    print(response.text)
+    print("--------------------")
+
+except Exception as e:
+    print(f"\n❌ Terjadi kesalahan: {e}")

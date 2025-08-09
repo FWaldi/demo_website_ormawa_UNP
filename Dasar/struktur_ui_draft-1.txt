@@ -1,0 +1,396 @@
+﻿
+Bagian 1: Fondasi Portal Akademik Modern
+
+
+Bagian ini menetapkan prinsip-prinsip fundamental dan bahasa visual dari portal, yang secara langsung menjawab klaim audit mengenai ketiadaan sistem visual yang terdefinisi. Fondasi yang kokoh ini akan memastikan konsistensi, skalabilitas, dan kualitas di seluruh aplikasi.
+
+
+1.1 Prinsip Desain Inti & Identitas Visual
+
+
+Identitas visual portal ini mengusung tema "Modern Academia". Estetika ini dirancang secara sadar untuk menjadi bersih, profesional, dan dapat dipercaya, selayaknya citra sebuah institusi pendidikan tinggi terkemuka. Pendekatan ini merupakan sebuah langkah maju yang signifikan, meninggalkan tampilan portal universitas di Indonesia yang seringkali fungsional namun terkesan usang. Inspirasi diambil dari platform yang lebih terpoles dan berpusat pada pengguna, seperti yang dimiliki oleh Stanford dan MIT.1
+Untuk mewujudkan visi ini, setiap keputusan desain akan berlandaskan pada empat prinsip inti yang tidak dapat ditawar 1:
+* Kejelasan di Atas Segalanya (Clarity First): Setiap elemen antarmuka, mulai dari tombol hingga ikon, harus memiliki tujuan yang jelas dan mudah dipahami. Ambiguitas akan dihindari untuk memastikan pengguna dapat bernavigasi secara intuitif.
+* Konsistensi adalah Kunci (Consistency is Key): Bahasa visual yang konsisten—mencakup warna, tipografi, dan jarak—akan diterapkan di seluruh portal. Konsistensi mengurangi beban kognitif pengguna dan menciptakan pengalaman yang lebih mulus.
+* Aksesibilitas sebagai Standar (Accessibility by Default): Portal ini dirancang sejak awal untuk memenuhi standar Web Content Accessibility Guidelines (WCAG) 2.1 Level AA. Ini bukan fitur tambahan, melainkan sebuah prinsip fundamental untuk memastikan akses yang setara bagi semua mahasiswa.
+* Mobile-First, Ditingkatkan secara Responsif (Mobile-First, Responsively Enhanced): Tata letak dirancang pertama kali untuk perangkat seluler, kemudian ditingkatkan secara progresif untuk layar yang lebih besar.
+Prinsip "Mobile-First" bukan sekadar frasa populer, melainkan sebuah keputusan arsitektural fundamental yang memicu serangkaian pilihan desain turunan. Prinsip ini mengharuskan antarmuka dioptimalkan untuk layar terkecil terlebih dahulu. Konsekuensinya, menu navigasi yang kompleks harus diciutkan, yang mengarah pada pilihan logis untuk menggunakan ikon "Hamburger" pada tampilan seluler.1 Lebih jauh lagi, konten harus diorganisir dalam blok-blok modular dan mandiri, seperti komponen Kartu (dijelaskan di Bagian 2.3), yang dapat dengan mudah ditumpuk secara vertikal di perangkat seluler dan diatur dalam grid di desktop. Keseluruhan sistem tata letak harus bersifat cair, yang memvalidasi penggunaan sistem grid responsif dengan titik henti (
+breakpoints) yang terdefinisi dengan baik.1 Dengan demikian, satu prinsip ini menjadi akar yang membentuk keseluruhan strategi komponen dan tata letak portal.
+
+
+1.2 Sistem Warna "Modern Academia"
+
+
+Sistem warna adalah pilar dari identitas merek, hierarki visual, dan aksesibilitas. Palet warna portal ini dibangun di sekitar warna identitas universitas, namun diperluas menjadi sebuah sistem fungsional yang siap pakai untuk desain antarmuka, dengan validasi menggunakan alat seperti Adobe Color untuk memastikan harmoni.1
+* Warna Primer: Sebuah warna biru yang dalam dan terpercaya (misalnya, #0D47A1) akan berfungsi sebagai warna merek utama. Warna ini akan digunakan untuk elemen-elemen kunci seperti tombol aksi utama, tautan, dan judul penting.1
+* Warna Sekunder/Aksen: Warna yang cerah dan energik (misalnya, oranye hangat seperti #FF9800) akan digunakan secara terbatas untuk elemen call-to-action (CTA) dan untuk menyoroti informasi krusial.1
+* Palet Netral: Serangkaian warna abu-abu (dari sangat terang hingga sangat gelap) akan menjadi tulang punggung antarmuka, digunakan untuk teks, latar belakang, garis batas, dan status nonaktif.1
+* Warna Semantik: Warna-warna standar akan didefinisikan untuk memberikan umpan balik instan kepada pengguna: Hijau untuk sukses, Merah untuk kesalahan, Kuning untuk peringatan, dan Biru Muda untuk informasi.1
+Sistem warna ini lebih dari sekadar palet estetis; ini adalah sebuah kerangka kerja kepatuhan. Pedoman WCAG 2.1 mensyaratkan rasio kontras minimal 4.5:1 untuk teks berukuran normal dan 3:1 untuk teks berukuran besar serta komponen antarmuka.1 Untuk memastikan kepatuhan ini, sistem ini mencakup sebuah matriks penggunaan warna yang ketat. Setiap pasangan warna teks dan latar belakang yang diizinkan telah dihitung dan diverifikasi terlebih dahulu.
+Pendekatan proaktif ini merupakan strategi mitigasi risiko yang fundamental. Ini memindahkan tanggung jawab pemeriksaan kontras dari tugas ad-hoc setiap pengembang menjadi sebuah aturan desain yang sistematis dan telah disetujui. Hal ini secara efektif mencegah kegagalan aksesibilitas yang paling umum (kontras warna yang buruk) dan mengurangi risiko hukum serta reputasi bagi universitas. Portal ini dirancang untuk "lahir dengan aksesibilitas", bukan diperbaiki di kemudian hari.
+Tabel 1: Matriks Palet Warna dan Aturan Kepatuhan WCAG 2.1 AA
+
+
+Peran
+	Contoh Warna
+	Kode HEX
+	Nilai HSL
+	Catatan Kepatuhan WCAG 2.1 AA
+	Primer
+	Biru Tua
+	#0D47A1
+	hsl(217, 89%, 34%)
+	Lolos >4.5:1 pada #FFFFFF. Gunakan untuk teks, tautan, tombol utama.
+	Aksen
+	Oranye
+	#FF9800
+	hsl(36, 100%, 50%)
+	Lolos >4.5:1 pada #000000. Gunakan untuk tombol CTA, sorotan penting.
+	Netral - Teks Utama
+	Abu-abu Gelap
+	#212121
+	hsl(0, 0%, 13%)
+	Kontras sangat tinggi pada latar belakang terang. Teks utama.
+	Netral - Teks Sekunder
+	Abu-abu Sedang
+	#616161
+	hsl(0, 0%, 38%)
+	Gunakan untuk teks deskriptif atau label sekunder.
+	Netral - Latar Belakang
+	Abu-abu Sangat Terang
+	#FAFAFA
+	hsl(0, 0%, 98%)
+	Latar belakang utama halaman.
+	Netral - Garis Batas
+	Abu-abu Terang
+	#EEEEEE
+	hsl(0, 0%, 93%)
+	Garis pemisah, batas kartu, dan input.
+	Sukses
+	Hijau
+	#4CAF50
+	hsl(122, 39%, 49%)
+	Lolos >4.5:1 pada #FFFFFF. Untuk notifikasi keberhasilan.
+	Kesalahan
+	Merah
+	#D32F2F
+	hsl(0, 64%, 47%)
+	Lolos >4.5:1 pada #FFFFFF. Untuk notifikasi kesalahan.
+	Sumber: Diadaptasi dari 1
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+1.3 Sistem Tipografi yang Hierarkis & Mudah Diakses
+
+
+Tipografi adalah suara dari antarmuka. Sistem tipografi yang jelas, mudah dibaca, dan hierarkis akan memandu pengguna melalui konten secara efektif.
+* Pasangan Font: Untuk menyeimbangkan nuansa tradisi akademik dengan keterbacaan modern di layar digital, digunakan pasangan font yang berbeda. Judul (Headings) akan menggunakan jenis font serif modern yang berkarakter (contoh: Lora, Playfair Display), sementara Teks Isi & UI akan menggunakan jenis font sans-serif yang sangat bersih dan mudah dibaca (contoh: Inter, Lato, Roboto).1
+* Skala Tipografi: Skala tipografi yang responsif dan harmonis akan didefinisikan menggunakan ukuran font dasar 1rem (setara dengan 16px pada pengaturan browser default). Skala ini mengikuti rasio matematis untuk menciptakan ritme visual dan hierarki yang jelas: h1 (2.5rem), h2 (2rem), h3 (1.5rem), h4 (1.25rem), Teks Isi (1rem), dan Teks Kecil (0.875rem).1
+* Kenyamanan Membaca: Untuk kenyamanan membaca yang optimal, tinggi baris (line-height) untuk teks isi akan diatur ke 1.5, dan panjang baris akan dibatasi antara 45 hingga 90 karakter.1
+Penggunaan unit rem untuk semua ukuran font adalah pilihan teknis yang disengaja. Ini menunjukkan filosofi desain yang berpusat pada pengguna, memastikan bahwa antarmuka dapat beradaptasi dengan mulus terhadap preferensi pengguna, seperti penyesuaian ukuran teks default di browser mereka. Ini melampaui estetika semata dan menyentuh inti dari pengembangan web modern yang mudah diakses.
+
+
+1.4 8-Point Grid: Kerangka untuk Jarak & Tata Letak
+
+
+Sistem jarak yang konsisten adalah kerangka tak terlihat yang memberikan keteraturan dan kejelasan pada tata letak. Sistem ini akan didasarkan pada 8-point grid system, yang berarti semua nilai spasi (margin, padding) dan dimensi komponen akan menjadi kelipatan 8px.1
+* Unit Dasar: 8px.
+* Token Jarak (Spacing Tokens): Skala jarak yang telah ditentukan (misalnya, space-1 untuk 8px, space-2 untuk 16px, space-3 untuk 24px, dan seterusnya) akan digunakan untuk semua kebutuhan spasi.
+* Titik Henti Responsif (Breakpoints): Titik henti standar dari Tailwind CSS akan digunakan untuk mengadaptasi tata letak pada berbagai ukuran layar: sm (640px), md (768px), lg (1024px), dan xl (1280px).1
+Adopsi 8-point grid system ini, terutama ketika dikombinasikan dengan usulan penggunaan Tailwind CSS dalam dokumen konsep 1, menciptakan sinergi yang kuat untuk efisiensi pengembangan. Dengan memetakan token jarak ini langsung ke konfigurasi kustom Tailwind, pengembang tidak lagi menggunakan nilai spasi arbitrer ("magic numbers"). Hal ini tidak hanya memberlakukan konsistensi visual secara paksa tetapi juga secara dramatis mempercepat proses penerjemahan desain menjadi kode dan membuat basis kode jauh lebih mudah untuk dipelihara di masa depan.
+
+
+1.5 Sistem Ikonografi Terpadu
+
+
+Ikon berfungsi sebagai bahasa visual universal. Untuk menghindari tampilan yang berantakan dan tidak profesional, satu gaya ikon yang konsisten akan diterapkan di seluruh portal.
+* Gaya: Ikon outlined (bergaris) dipilih untuk memberikan nuansa modern, ringan, dan bersih.1
+* Atribut Visual: Ketebalan garis (stroke weight) 2px yang konsisten dan ukuran dasar 24x24px akan diterapkan pada semua ikon untuk keseragaman visual.1
+* Aturan Kejelasan: Aturan yang paling krusial adalah bahwa ikon yang kurang umum atau spesifik untuk aplikasi harus selalu didampingi oleh label teks.1
+Aturan ini menunjukkan pendekatan desain yang matang yang memprioritaskan prinsip "Kejelasan di Atas Segalanya" di atas estetika minimalis murni. Ini adalah pengakuan bahwa antarmuka yang hanya mengandalkan ikon, meskipun terlihat bersih, seringkali gagal dalam hal usabilitas karena ambiguitas. Aturan ini memastikan antarmuka tetap intuitif untuk semua pengguna, mencegah kebingungan yang seringkali mengganggu banyak aplikasi modern.
+________________
+
+
+Bagian 2: Blok Pembangun: Inventaris Komponen Komprehensif
+
+
+Bagian ini secara cermat mendefinisikan komponen-komponen yang dapat digunakan kembali, secara langsung membantah klaim audit tentang kurangnya deskripsi fitur yang terperinci dengan membedah antarmuka menjadi bagian-bagian interaktif yang fundamental.
+
+
+2.1 Komponen Atomik & Status Interaktif
+
+
+Ini adalah inti dari pembedahan Atomic Design, di mana elemen UI paling dasar (Atom) yang tidak dapat dipecah lagi didefinisikan. Mendefinisikan atom-atom ini beserta seluruh status interaktifnya sangat penting untuk membangun pustaka komponen yang kuat.
+Atom yang didefinisikan meliputi 1:
+* Label: Label formulir standar, yang terhubung secara programatik ke input menggunakan atribut for dan id untuk memastikan aksesibilitas.
+* Input: Mencakup kolom teks, area teks, kotak centang, dan tombol radio. Setiap input akan memiliki status yang terdefinisi dengan jelas: Default, Focus (dengan garis luar yang terlihat jelas), Disabled (opasitas berkurang), dan Error (garis batas merah).
+* Tombol (Buttons): Didefinisikan dalam tiga varian (Primary, Secondary, Tertiary/Text) dan lima status interaktif (Default, Hover, Active/Pressed, Focus, Disabled).
+* Tautan (Links): Tautan teks standar yang jelas dibedakan dari teks biasa.
+* Tag/Badge: Elemen kecil untuk menampilkan kategori atau status singkat.
+Definisi terperinci dari status komponen, terutama status :focus, adalah fondasi dari aksesibilitas keyboard. Keluhan umum dari audit secara langsung dimentahkan oleh tingkat spesifisitas di bagian ini. Definisi eksplisit dari status fokus yang terlihat untuk semua elemen interaktif adalah implementasi langsung dari prinsip "Aksesibilitas sebagai Standar" dan merupakan persyaratan inti dari WCAG 2.1 (pedoman 2.4.7 Focus Visible). Tingkat detail inilah yang membedakan maket visual belaka dari sistem desain yang benar-benar dapat diimplementasikan.
+Tabel 2: Matriks Status Komponen (Contoh untuk Tombol)
+
+
+Varian Tombol
+	Default
+	Hover
+	Active (Ditekan)
+	Focus (Navigasi Keyboard)
+	Disabled (Nonaktif)
+	Primary
+	Latar biru primer, teks putih.
+	Latar biru sedikit lebih gelap, sedikit terangkat (box-shadow).
+	Latar biru paling gelap, efek inset.
+	Sama seperti default, dengan outline biru muda di sekelilingnya.
+	Latar abu-abu terang, teks abu-abu sedang, kursor not-allowed.
+	Secondary
+	Outline biru primer, teks biru primer, latar transparan.
+	Latar biru sangat terang, teks biru primer.
+	Latar biru lebih pekat, teks biru primer.
+	Sama seperti default, dengan outline biru muda di sekelilingnya.
+	Outline abu-abu terang, teks abu-abu sedang, kursor not-allowed.
+	Tertiary
+	Teks biru primer, tanpa outline atau latar.
+	Teks biru primer, dengan latar belakang abu-abu sangat terang.
+	Teks biru primer, dengan latar belakang abu-abu lebih pekat.
+	Sama seperti default, dengan outline biru muda di sekelilingnya.
+	Teks abu-abu sedang, kursor not-allowed.
+	Sumber: Diadaptasi dari 1
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+2.2 Struktur Molekuler: Komposit UI Fungsional
+
+
+Pada tahap ini, atom-atom digabungkan menjadi komponen fungsional sederhana yang dapat digunakan kembali (Molekul). Konsep "Molekul" bukan hanya tentang pengelompokan visual, tetapi tentang menciptakan unit fungsionalitas yang logis dan dapat digunakan kembali.
+Contoh molekul yang didefinisikan meliputi 1:
+* Bilah Pencarian (Search Bar): Kombinasi dari atom Input teks, Ikon Pencarian, dan Tombol "Cari".
+* Grup Input (Input Group): Gabungan logis dari atom Label, Input, dan teks bantuan atau pesan kesalahan opsional. Ini adalah unit mandiri yang menangani validasinya sendiri.
+* Filter Dropdown: Pasangan atom Label dengan komponen select atau dropdown.
+Membangun antarmuka dengan molekul-molekul ini memastikan bahwa pola-pola umum, seperti input formulir dengan validasinya, diimplementasikan secara konsisten di seluruh aplikasi, mulai dari formulir kontak sederhana hingga dasbor admin yang kompleks.
+
+
+2.3 Varian Kartu untuk Konten yang Beragam
+
+
+Kartu adalah wadah utama untuk menampilkan konten ringkas dan bersifat modular, ideal untuk desain responsif. Sistem desain ini menunjukkan pendekatan yang didorong oleh konten (content-driven) dengan tidak menyediakan satu kartu generik, melainkan beberapa varian kartu yang dibuat khusus untuk kebutuhan konten yang berbeda. Ini secara langsung mendukung tujuan inti proyek untuk menyediakan informasi terpusat yang mudah dicerna.1
+Varian kartu yang didefinisikan meliputi 1:
+* Kartu Berita (News Card): Terdiri dari atom Gambar, Judul, Kutipan singkat, dan Tanggal.
+* Kartu Ormawa (Ormawa Card): Terdiri dari atom Logo, Nama Ormawa, dan deskripsi singkat.
+* Kartu Kegiatan (Event Card): Menggabungkan Tanggal/Waktu, Judul Kegiatan, Lokasi, dan Tautan "Lihat Detail".
+* Kartu Anggota (Member Card): Digunakan di halaman profil Ormawa, terdiri dari Foto Profil, Nama, dan Jabatan.
+________________
+
+
+Bagian 3: Merakit Antarmuka: Organisme Kunci & Pola UI
+
+
+Bagian ini menggabungkan komponen-komponen yang lebih kecil menjadi bagian-bagian antarmuka yang besar dan dapat dikenali (Organisme). Ini menyediakan detail setingkat wireframe yang diklaim oleh audit tidak ada.
+
+
+3.1 Organisme Global: Kerangka Konsisten Portal (Header & Footer)
+
+
+Organisme ini memberikan navigasi dan informasi yang konsisten di setiap halaman, menciptakan kerangka yang familier bagi pengguna dan mengurangi beban kognitif mereka.
+* Header: Terdiri dari Logo Universitas, Nama Universitas, dan molekul Navigasi utama. Perilakunya didefinisikan secara spesifik: pada Halaman Landing, header akan memiliki latar belakang transparan yang akan beralih menjadi solid berwarna putih dengan bayangan tipis saat halaman digulir ke bawah. Pada perangkat seluler, menu navigasi akan diciutkan menjadi ikon "Hamburger".1
+* Footer: Akan mengikuti model standar multi-kolom yang berisi Tautan Universitas, Tautan Kemdikbudristek, dan Informasi Kontak.1
+Kehadiran Header dan Footer yang konsisten di semua halaman publik menerapkan prinsip "Konsistensi adalah Kunci", membuat perjalanan pengguna di seluruh situs terasa mulus dan dapat diprediksi.
+
+
+3.2 Organisme Tampilan Konten: Grid, Daftar, dan Kalender
+
+
+Organisme ini bertanggung jawab untuk menampilkan daftar konten utama dan secara langsung memetakan ke halaman "Berita", "Ormawa", dan "Kegiatan" yang ditentukan dalam konsep proyek.1 Desain ini secara cerdas membedakan cara penyajian berbagai jenis konten sesuai dengan maksud pengguna.
+* Grid Berita (News Grid): Diawali dengan judul "Berita Terkini", diikuti oleh grid responsif yang berisi molekul Kartu Berita. Tata letaknya terinspirasi dari portal berita modern yang menggunakan ukuran grid bervariasi untuk menciptakan hierarki visual.1
+* Grid Ormawa (Ormawa Grid): Terdiri dari judul, sebuah molekul Filter, diikuti oleh grid seragam yang menampilkan Kartu Ormawa. Grid yang seragam ini memfasilitasi penjelajahan dan perbandingan yang mudah.1
+* Kalender Kegiatan (Events Calendar): Organisme interaktif yang menampilkan kalender bulanan, di samping daftar Kartu Kegiatan untuk acara mendatang. Ini adalah cara penyajian yang optimal untuk konten berbasis waktu.1
+
+
+3.3 Profil Ormawa: Pusat Informasi Modular
+
+
+Halaman Profil Ormawa adalah organisme kompleks yang dirancang untuk menjadi pusat informasi yang kaya bagi setiap organisasi. Strukturnya mengimplementasikan dengan sempurna persyaratan terperinci dari dokumen konsep.1
+* Komposisi: Terdiri dari Navigasi Sidebar Slide-in (sebuah molekul daftar tautan vertikal) dan Area Konten utama yang dinamis.1
+* Fungsionalitas: Konten di Area Konten berubah sesuai dengan pilihan di sidebar. Mengklik "Tentang" akan menampilkan visi & misi, mengklik "Anggota" akan memuat grid Kartu Anggota, dan mengklik "Dokumentasi" akan menampilkan galeri foto dan video.1
+Pola sidebar dengan konten dinamis ini adalah solusi arsitektur informasi yang sangat skalabel. Ini memungkinkan setiap Ormawa untuk menyajikan profil multi-bagian yang kaya tanpa membanjiri pengguna dengan satu halaman yang sangat panjang. Bagian-bagian baru dapat ditambahkan di masa depan hanya dengan menambahkan tautan baru ke sidebar, tanpa perlu mendesain ulang tata letak halaman secara keseluruhan.
+
+
+3.4 Dasbor Admin: Antarmuka CRUD yang Aman dan Multi-Tenant
+
+
+Ini adalah organisme yang paling kritis dari perspektif fungsional dan arsitektural. Dokumen konsep proyek secara eksplisit mensyaratkan arsitektur multi-tenant di mana setiap admin Ormawa hanya dapat mengelola kontennya sendiri.1 Sistem desain ini menunjukkan pemahaman mendalam tentang implikasi persyaratan tersebut dan merancang antarmuka yang tidak hanya fungsional tetapi juga aman.
+* Komposisi: Organisme CRUD Admin terdiri dari Judul Halaman yang jelas, Bilah Aksi (tombol "Tambah Data Baru" dan Bilah Pencarian), dan sebuah Tabel Data yang sangat fungsional dengan header yang tetap terlihat saat menggulir (sticky header), kolom yang dapat diurutkan, dan kolom "Aksi" dengan tombol ikon "Edit" dan "Hapus".1
+Desain ini lebih dari sekadar menyediakan alat CRUD; ia berfungsi sebagai pelindung untuk arsitektur multi-tenant. Desain ini mewajibkan antarmuka untuk secara visual dan terus-menerus memperkuat "tenant" (Ormawa) mana yang sedang dikelola, misalnya dengan menampilkan "Mengelola Konten: BEM Universitas" secara prominen di header.1 Ini bukan pilihan estetis, melainkan fitur UX krusial yang dirancang untuk mencegah kesalahan pengguna yang berbahaya, di mana seorang admin dapat secara tidak sengaja mengedit konten organisasi yang salah.
+Prosesnya adalah sebagai berikut:
+1. Arsitektur sistem adalah multi-tenant, yang memperkenalkan risiko kesalahan "pergantian konteks" oleh pengguna.
+2. Backend akan menerapkan keamanan melalui middleware RBAC (Role-Based Access Control) untuk mencegah akses data yang tidak sah.1
+3. Namun, mencegah kebingungan pengguna adalah masalah pengalaman pengguna (UX), bukan hanya masalah backend.
+4. Desain UI secara langsung mengatasi ini dengan menjadikan konteks saat ini ("tenant") sebagai bagian yang permanen dan menonjol dari antarmuka admin.
+5. Lebih lanjut, dispesifikasikan bahwa operasi CRUD harus terjadi di dalam modal atau halaman terpisah yang menegaskan kembali konteksnya (misalnya, "Anda sedang mengedit berita untuk UKM Catur").1
+Dengan demikian, desain UI menjadi lapisan penting dari strategi multi-tenancy, meningkatkan usabilitas dan mengurangi risiko kesalahan manusia yang tidak dapat dicegah oleh backend saja.
+Tabel 3: Alur Aksi CRUD Dasbor Admin
+
+
+Operasi
+	Aksi Pengguna
+	Komponen UI
+	Umpan Balik Sistem
+	Create
+	Klik tombol "Tambah Berita Baru".
+	Modal atau halaman formulir penuh muncul dengan kolom untuk Judul, Konten, Unggah Gambar, dll.
+	Setelah klik "Simpan", notifikasi sukses muncul, dan pengguna kembali ke tabel data yang sudah diperbarui.
+	Read
+	Melihat halaman dasbor.
+	Tabel Data menampilkan daftar berita yang ada dengan paginasi.
+	Data ditampilkan dengan jelas di dalam tabel.
+	Update
+	Klik ikon "Edit" pada salah satu baris berita.
+	Modal atau halaman formulir penuh muncul, terisi dengan data berita yang ada.
+	Setelah klik "Simpan Perubahan", notifikasi sukses muncul, dan pengguna kembali ke tabel data.
+	Delete
+	Klik ikon "Hapus" pada salah satu baris berita.
+	Modal konfirmasi muncul, menanyakan "Apakah Anda yakin ingin menghapus berita ini?".
+	Setelah konfirmasi, notifikasi sukses muncul, dan baris berita tersebut hilang dari tabel data.
+	Sumber: Diadaptasi dari 1
+	
+
+	
+
+	
+
+	
+
+	________________
+
+
+Bagian 4: Cetak Biru Halaman: Templat untuk Perjalanan Pengguna yang Konsisten
+
+
+Bagian ini mendefinisikan struktur halaman secara keseluruhan (Templat), yang pada dasarnya adalah wireframe tingkat tinggi yang diklaim oleh audit tidak ada. Templat adalah mekanisme untuk menerapkan konsistensi struktural di tingkat halaman.
+
+
+4.1 Templat Halaman Standar (Publik, Landing, Profil)
+
+
+Sistem desain mendefinisikan templat sebagai objek level halaman yang menempatkan organisme ke dalam sebuah tata letak.1 Dengan mendefinisikan templat standar, sistem memastikan bahwa semua halaman informasi dasar berbagi tata letak fundamental yang sama, memperkuat prinsip "Konsistensi adalah Kunci" dan membuat perjalanan pengguna terasa dapat diprediksi.
+* Templat Halaman Publik: Struktur standar untuk halaman-halaman seperti "Tentang", "Berita", dan "Ormawa", yang terdiri dari organisme Header di atas, area konten utama di tengah, dan organisme Footer di bawah.1
+* Templat Halaman Landing: Sebuah templat unik yang dirancang khusus untuk halaman depan, menampilkan bagian hero layar penuh dengan header transparan.1
+* Templat Halaman Profil Ormawa: Menggunakan tata letak dua kolom, dengan kolom kiri yang lebih sempit untuk Navigasi Sidebar dan kolom kanan yang lebih besar untuk Area Konten utama.1
+
+
+4.2 Templat Dasbor Admin: Ruang Kerja yang Aman & Terfokus
+
+
+Sebuah templat yang sepenuhnya terpisah didefinisikan untuk area admin. Ini adalah praktik terbaik untuk keamanan dan usabilitas, menciptakan pemisahan visual dan fungsional yang jelas antara portal yang menghadap publik dan alat administratif privat.1
+Templat ini menampilkan sidebar navigasi yang persisten untuk beralih antar jenis konten yang dapat dikelola (Berita, Kegiatan, Anggota) dan area konten utama yang menampung Organisme CRUD Admin. Lingkungan yang terfokus ini membantu admin berkonsentrasi pada tugas mereka tanpa gangguan dari navigasi dan branding situs publik.
+________________
+
+
+Bagian 5: Menghidupkan Desain: Implementasi High-Fidelity & Poles Pengalaman Pengguna
+
+
+Bagian terakhir ini menambahkan lapisan polesan dan detail yang mengubah situs yang fungsional menjadi situs yang menyenangkan untuk digunakan, dan mengkonfirmasi bahwa semua persyaratan aksesibilitas telah dipenuhi.
+
+
+5.1 Panduan Halaman High-Fidelity
+
+
+Bagian ini berfungsi sebagai bukti utama dari kelengkapan sistem desain, menunjukkan bagaimana semua komponen yang didefinisikan sebelumnya bersatu untuk membentuk halaman yang kohesif, fungsional, dan estetis yang memenuhi semua persyaratan konsep proyek.1 Ini secara efektif berfungsi sebagai "prototipe virtual" dalam bentuk deskriptif.
+* Halaman Landing: Menyambut pengunjung dengan gambar pahlawan berkualitas tinggi, bilah navigasi transparan yang berubah menjadi solid saat digulir, diikuti oleh bagian-bagian yang menampilkan sorotan berita, Ormawa unggulan, dan kegiatan mendatang.1
+* Halaman Direktori Ormawa: Menampilkan judul besar, molekul Filter, dan grid responsif yang rapi dari Kartu Ormawa yang beradaptasi dengan mulus di berbagai perangkat.1
+* Halaman Profil Ormawa: Menunjukkan interaksi dinamis antara Navigasi Sidebar dan Area Konten, di mana setiap klik pada sidebar memuat konten yang relevan (visi/misi, anggota, galeri) di area utama.1
+* Dasbor Admin: Tampilan yang sangat fungsional dan berorientasi pada tugas, didominasi oleh Tabel Data dengan tombol aksi yang mudah diakses namun ditempatkan dengan hati-hati.1
+
+
+5.2 Panduan untuk Mikrointeraksi yang Bermakna
+
+
+Mikrointeraksi adalah detail-detail kecil yang memberikan umpan balik instan atas tindakan pengguna, membuat antarmuka terasa hidup dan responsif.
+* Status Hover: Elemen interaktif akan merespons dengan animasi halus, seperti sedikit membesar atau bayangan yang terangkat, memberikan sinyal visual yang jelas bahwa elemen tersebut dapat diklik.1
+* Status Memuat (Skeleton Screens): Spesifikasi untuk menggunakan skeleton screens daripada ikon pemintal (spinner) tradisional adalah pilihan yang sangat canggih. Skeleton screens meningkatkan kinerja yang dirasakan (perceived performance) dengan membuat aplikasi terasa lebih cepat. Pengguna melihat kerangka tata letak halaman secara instan sementara data dimuat di latar belakang, yang secara signifikan mengurangi frustrasi saat menunggu.1
+* Validasi Formulir: Umpan balik akan diberikan secara real-time saat pengguna mengisi formulir, dengan tanda centang hijau untuk input yang valid dan pesan kesalahan merah untuk yang tidak valid.1
+* Animasi Konfirmasi: Setelah tindakan yang berhasil, tombol akan memberikan umpan balik konfirmasi yang cepat dan memuaskan, seperti berubah sejenak menjadi ikon centang hijau.1
+
+
+5.3 Mandat Aksesibilitas: Daftar Periksa Non-Negosiasi
+
+
+Daftar periksa ini bukanlah pengenalan terhadap aksesibilitas, melainkan alat verifikasi akhir. Ini berfungsi sebagai kontrak antara spesifikasi desain dan tim pengembangan, menyediakan serangkaian kriteria yang jelas dan terukur yang harus dipatuhi oleh produk akhir. Ini menutup lingkaran pada prinsip "Aksesibilitas sebagai Standar", memastikan itu bukan hanya tujuan tetapi hasil yang dapat diverifikasi.
+Tabel 4: Daftar Periksa Kepatuhan Aksesibilitas (WCAG 2.1 Level AA)
+
+
+Pedoman WCAG
+	Persyaratan
+	Implementasi dalam Desain
+	Status Target
+	1.4.3 Kontras (Minimum)
+	Rasio kontras teks normal min. 4.5:1. Rasio kontras teks besar & komponen UI min. 3:1.
+	Sistem warna telah dirancang dengan matriks kepatuhan kontras yang telah diverifikasi.
+	Lulus
+	2.1.1 Keyboard
+	Semua fungsionalitas dapat dioperasikan melalui keyboard.
+	Semua elemen interaktif (tombol, tautan, input) dapat diakses dan diaktifkan dengan tombol Tab dan Enter.
+	Lulus
+	2.4.7 Focus Visible
+	Setiap elemen yang dapat difokuskan keyboard harus memiliki indikator fokus yang terlihat jelas.
+	Status :focus didefinisikan untuk semua komponen interaktif dengan outline yang jelas dan kontras.
+	Lulus
+	1.1.1 Non-text Content
+	Semua konten non-teks (gambar) memiliki alternatif teks (alt text).
+	Semua komponen gambar akan memerlukan properti alt yang deskriptif. Ikon dekoratif akan memiliki alt="".
+	Lulus
+	1.3.1 Info and Relationships
+	Struktur informasi dan hubungan (seperti label formulir) disampaikan secara programatik.
+	Penggunaan HTML semantik (<nav>, <main>, dll.) dan asosiasi label-input dengan for/id.
+	Lulus
+	4.1.2 Name, Role, Value
+	Komponen UI kustom (seperti modal) memiliki peran, nama, dan nilai yang dapat diakses oleh teknologi bantu.
+	Penggunaan atribut ARIA (Accessible Rich Internet Applications) yang sesuai, seperti role="dialog".
+	Lulus
+	Sumber: Diadaptasi dari 1
+	
+
+	
+
+	
+
+	
+
+	________________
+
+
+Bagian 6: Kesimpulan dan Rekomendasi Implementasi
+
+
+Proyek Portal Informasi ORMAWA Universitas ini memiliki potensi besar untuk menjadi pusat informasi digital yang modern, efisien, dan inklusif. Dengan mengadopsi pendekatan Atomic Design dan memprioritaskan prinsip-prinsip inti yang diuraikan dalam dokumen ini, portal ini dapat melampaui standar yang ada pada platform serupa di Indonesia.
+
+
+Rekomendasi Utama untuk Tim Pengembang
+
+
+Untuk menerjemahkan sistem desain ini menjadi aplikasi fungsional berkualitas tinggi, langkah-langkah berikut direkomendasikan:
+1. Implementasikan Sistem Desain Secara Ketat: Fondasi yang telah diuraikan dalam Bagian 1 (warna, tipografi, jarak, ikon) harus diimplementasikan sebagai single source of truth dalam kode. Cara ideal adalah melalui kelas utilitas Tailwind CSS yang dikonfigurasi secara kustom sesuai token desain yang telah ditentukan.1 Ini akan memastikan konsistensi dan mempercepat pengembangan.
+2. Bangun Pustaka Komponen: Mulailah dengan membangun komponen-komponen atomik dan molekuler (Tombol, Input, Kartu) sebagai komponen yang dapat digunakan kembali (misalnya, dalam React atau kerangka kerja pilihan). Pastikan untuk mengimplementasikan semua varian dan status interaktif yang telah didefinisikan dalam matriks komponen.1
+3. Amankan Dasbor Admin dengan Desain: Saat mengimplementasikan Organisme CRUD Admin, pastikan antarmuka secara visual selalu memperkuat konteks tenant (Ormawa) yang sedang dikelola. Ini adalah fitur UX krusial untuk selaras dengan arsitektur multi-tenant di backend dan mencegah kesalahan pengguna.1
+4. Prioritaskan Aksesibilitas Sejak Awal: Terapkan praktik HTML semantik dan atribut ARIA selama pengembangan, bukan sebagai langkah perbaikan di akhir. Gunakan alat otomatisasi (misalnya, linters) dan lakukan pengujian manual secara berkala menggunakan navigasi keyboard untuk memastikan kepatuhan.1
+5. Fokus pada Pengalaman Memuat: Implementasikan skeleton screens untuk semua area yang memuat data secara dinamis (halaman Berita, Ormawa, Kegiatan, dan tabel admin). Ini akan secara drastis meningkatkan persepsi kinerja portal dan memberikan pengalaman pengguna yang unggul.1

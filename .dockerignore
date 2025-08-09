@@ -1,0 +1,21 @@
+# Dependensi yang akan diinstal di dalam kontainer
+node_modules
+
+# Hasil build Next.js
+.next
+
+# File lingkungan lokal
+.env
+.env.local
+.env.development
+.env.production
+
+# Log dan file sementara
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Konfigurasi IDE
+.vscode
+.idea

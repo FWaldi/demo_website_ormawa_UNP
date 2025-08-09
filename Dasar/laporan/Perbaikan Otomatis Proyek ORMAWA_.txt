@@ -1,0 +1,491 @@
+﻿1. Analisis Eksekutif Proyek "Portal ORMAWA"
+
+
+
+
+1.1. Tinjauan Proyek dan Apresiasi
+
+
+Proyek "Portal Informasi ORMAWA" yang sedang dikembangkan merupakan sebuah inisiatif yang patut diapresiasi, dengan tujuan mulia untuk memusatkan informasi dan dokumentasi bagi seluruh organisasi mahasiswa.1 Pemilihan tumpukan teknologi modern yang mencakup Next.js, TypeScript, Tailwind CSS, dan Docker menunjukkan pemahaman yang baik terhadap tren pengembangan web saat ini dan meletakkan fondasi yang kuat untuk aplikasi yang skalabel dan mudah dikelola.1 Arsitektur yang direncanakan, terutama fitur admin multi-tenant, menunjukkan visi yang jelas untuk menyediakan platform yang mandiri dan berdaya guna bagi setiap ORMAWA.
+
+
+1.2. Identifikasi Celah Arsitektural Kritis
+
+
+Meskipun fondasinya kuat, analisis mendalam terhadap konfigurasi proyek mengungkapkan adanya celah arsitektural yang menjadi akar dari permasalahan yang dihadapi. Kegagalan deployment Docker yang menghasilkan pesan "internal error" bukanlah sebuah bug minor, melainkan gejala dari kesalahpahaman fundamental dalam strategi kontainerisasi: penerapan konfigurasi yang berpusat pada lingkungan pengembangan (development) untuk proses build produksi (production).
+Konfigurasi docker-compose.yml yang ada saat ini dirancang secara efektif untuk pengembangan lokal.1 Penggunaan
+command: npm run dev dan pemasangan volume secara langsung (volumes:.:/usr/src/app) adalah praktik standar untuk menciptakan alur kerja yang efisien, di mana perubahan kode pada mesin host dapat secara langsung terlihat di dalam kontainer. Namun, pendekatan ini secara inheren bertentangan dengan tujuan dari docker build untuk produksi. Proses build produksi bertujuan untuk menciptakan sebuah artefak yang immutable (tidak dapat diubah), portabel, dan teroptimasi—sebuah image yang berisi aplikasi yang sudah terkompilasi dan siap dijalankan di lingkungan mana pun tanpa memerlukan kode sumber asli.
+Kegagalan yang terjadi adalah konsekuensi logis dari konflik ini. Server pengembangan Next.js tidak dirancang untuk menangani lalu lintas produksi dan bergantung pada file-file yang tidak termasuk dalam build produksi standar. Lebih jauh lagi, kesalahan konfigurasi jaringan antar-kontainer yang menggunakan localhost alih-alih nama layanan Docker memperparah masalah ini, menyebabkan kegagalan pengambilan data sisi server (server-side fetching) yang pada akhirnya memicu "internal error" yang ditampilkan kepada pengguna.
+
+
+1.3. Tujuan Laporan dan Peta Jalan Strategis
+
+
+Memorandum ini bertujuan untuk memberikan solusi yang komprehensif dan edukatif, tidak hanya untuk memperbaiki masalah yang ada tetapi juga untuk membekali pengembang dengan pengetahuan praktik terbaik. Peta jalan yang akan dipaparkan adalah sebagai berikut:
+1. Modernisasi Dependensi: Melakukan audit menyeluruh terhadap semua dependensi proyek, memberikan rekomendasi pembaruan yang aman ke versi stabil terbaru untuk meningkatkan keamanan, kinerja, dan stabilitas.
+2. Dekonstruksi Kegagalan Docker: Menguraikan secara konseptual perbedaan kritis antara lingkungan Docker untuk pengembangan dan produksi, menjelaskan mengapa pendekatan saat ini gagal.
+3. Implementasi Blueprint Produksi: Menyediakan cetak biru lengkap untuk deployment Docker tingkat produksi, termasuk Dockerfile multi-tahap yang teroptimasi, konfigurasi .dockerignore, dan docker-compose.yml yang telah direvisi.
+4. Rekomendasi dan Langkah Selanjutnya: Menyajikan daftar periksa yang dapat ditindaklanjuti untuk perbaikan segera dan rekomendasi strategis untuk kesehatan jangka panjang proyek.
+
+
+2. Audit Modernisasi dan Stabilitas Dependensi
+
+
+
+
+2.1. Pentingnya Versioning Semantik dan Kesehatan Dependensi
+
+
+Sebelum melakukan pembaruan, penting untuk memahami Semantic Versioning (SemVer), sebuah standar penomoran versi yang diadopsi secara luas dalam ekosistem npm. Sebuah versi direpresentasikan sebagai MAJOR.MINOR.PATCH (contoh: 14.2.31).
+* MAJOR: Perubahan yang tidak kompatibel dengan versi sebelumnya (breaking changes).
+* MINOR: Penambahan fungsionalitas baru yang tetap kompatibel dengan versi sebelumnya.
+* PATCH: Perbaikan bug yang kompatibel dengan versi sebelumnya.
+Dalam package.json, awalan ^ (caret) mengizinkan pembaruan pada level MINOR dan PATCH (misalnya, ^1.2.0 dapat menginstal 1.3.0 tetapi tidak 2.0.0), sementara ~ (tilde) hanya mengizinkan pembaruan PATCH. Memahami ini adalah kunci untuk melakukan pembaruan yang aman.
+
+
+2.2. Analisis Kerangka Kerja Inti: Next.js dan React
+
+
+* Kondisi Saat Ini: Proyek menggunakan next: 14.2.31 dan react: ^18.1 Versi
+14.2.31 adalah rilis patch terbaru untuk Next.js 14, yang menandakan bahwa versi ini sudah stabil dalam cabangnya.2
+* Analisis Pasar: Versi stabil terbaru dari Next.js adalah versi 15 (khususnya 15.4.6), yang membawa dukungan stabil untuk React 19.2 Versi stabil terbaru dari React adalah
+19.1.1.5
+* Rekomendasi Strategis: Melakukan lompatan dari Next.js 14 ke 15 adalah langkah besar yang melibatkan pembaruan versi MAJOR baik untuk kerangka kerja maupun pustaka intinya (React). Pembaruan semacam ini memiliki risiko tinggi untuk menimbulkan breaking changes dan memerlukan migrasi kode yang cermat. Mencampurkan migrasi besar ini dengan perbaikan masalah deployment akan membuat proses debugging menjadi sangat kompleks.
+Oleh karena itu, pendekatan rekayasa perangkat lunak yang paling bertanggung jawab adalah menunda pembaruan MAJOR. Prioritas utama saat ini adalah menstabilkan dan men-deploy aplikasi pada tumpukan teknologi yang ada. Direkomendasikan untuk mengunci versi saat ini pada 14.2.31 untuk memastikan stabilitas, menyelesaikan masalah Docker, dan setelah itu, merencanakan migrasi ke Next.js 15 sebagai tugas terpisah.
+
+
+2.3. Analisis Pustaka UI dan Utilitas
+
+
+   * Kondisi Saat Ini: Proyek menggunakan berbagai paket @fullcalendar/* pada versi ^6.1.15 dan @radix-ui/* seperti react-accordion pada ^1.2.0.1
+   * Analisis Pasar: Versi stabil terbaru untuk FullCalendar adalah 6.1.18.7 Untuk Radix UI Accordion, versi stabil terbaru adalah
+1.2.11.9
+   * Rekomendasi: Pembaruan ini berada pada level MINOR dan PATCH. Pustaka-pustaka ini mengikuti SemVer dengan baik, sehingga pembaruan ini sangat mungkin kompatibel sepenuhnya dan membawa perbaikan bug serta peningkatan kinerja. Sangat disarankan untuk memperbarui semua pustaka ini ke versi minor/patch terbaru untuk mendapatkan manfaat dari perbaikan tersebut.
+
+
+2.4. Audit Rantai Alat Pengembangan
+
+
+Dependensi pengembangan (devDependencies) seperti @typescript-eslint/eslint-plugin, eslint, prettier, dan typescript juga harus diperbarui ke versi stabil terbarunya. Ini akan meningkatkan kualitas analisis kode statis, pengalaman pengembang, dan memastikan kompatibilitas dengan sintaksis terbaru.
+
+
+2.5. Tabel: Audit Dependensi dan Rekomendasi Pembaruan
+
+
+Tabel berikut merangkum rekomendasi pembaruan untuk proyek ini, mengubah analisis kompleks menjadi daftar periksa yang dapat ditindaklanjuti.
+Paket
+	Versi Saat Ini
+	Versi Stabil Direkomendasikan
+	Tipe Pembaruan
+	Catatan / Tindakan yang Diperlukan
+	next
+	14.2.31
+	14.2.31 (Kunci) / 15.4.6 (Rencanakan)
+	Patch / Mayor
+	Versi saat ini stabil. Prioritaskan perbaikan Docker. Rencanakan migrasi ke v15 sebagai tugas terpisah.
+	react, react-dom
+	^18
+	^18 (Kunci) / 19.1.1 (Rencanakan)
+	Mayor
+	Pembaruan terikat pada migrasi Next.js 15. Tunda untuk saat ini.
+	@fullcalendar/*
+	^6.1.15
+	^6.1.18
+	Patch
+	Aman untuk diperbarui. Jalankan npm install @fullcalendar/core@latest... untuk semua paket terkait.
+	@radix-ui/*
+	^1.x.x
+	Versi minor terbaru (misal: ^1.2.11)
+	Minor
+	Aman untuk diperbarui. Perbarui semua paket @radix-ui/* secara bersamaan untuk konsistensi.
+	lucide-react
+	^0.400.0
+	Versi minor terbaru
+	Minor
+	Aman untuk diperbarui.
+	typescript
+	^5
+	Versi minor terbaru dari v5
+	Minor
+	Aman untuk diperbarui ke rilis v5 terbaru.
+	@typescript-eslint/*
+	^7.15.0
+	Versi minor terbaru
+	Minor
+	Aman untuk diperbarui.
+	eslint
+	^8
+	Versi minor terbaru dari v8
+	Minor
+	Aman untuk diperbarui.
+	prettier
+	^3.3.2
+	Versi minor terbaru
+	Minor
+	Aman untuk diperbarui.
+	
+
+3. Dekonstruksi Kegagalan Docker: Pengembangan vs. Produksi
+
+
+
+
+3.1. Kekeliruan Perintah: npm run dev dalam Build Produksi
+
+
+Analisis docker-compose.yml menunjukkan penggunaan command: npm run dev untuk layanan frontend.1 Perintah ini secara spesifik memanggil server pengembangan Next.js. Server ini sangat berguna untuk pengembangan karena menyediakan fitur seperti
+Hot Module Replacement (HMR), Fast Refresh, dan pesan error yang detail. Namun, server ini sama sekali tidak dioptimalkan untuk produksi. Server ini tidak melakukan minifikasi kode, tidak mengoptimalkan bundling, dan memiliki jejak memori yang lebih besar.
+Untuk produksi, alur kerja yang benar dan didukung secara resmi adalah proses dua langkah:
+      1. npm run build: Perintah ini, yang setara dengan next build, mengkompilasi aplikasi TypeScript/React, menggabungkan dan meminifikasi file JavaScript dan CSS, mengoptimalkan gambar, dan menghasilkan struktur file statis yang sangat teroptimasi di dalam direktori .next.11
+      2. npm run start: Perintah ini, yang setara dengan next start, menjalankan server Node.js tingkat produksi yang sangat dioptimalkan untuk menyajikan file-file yang telah dibuat oleh next build.12
+Menjalankan npm run dev di dalam sebuah image yang dimaksudkan untuk produksi adalah kesalahan konseptual utama yang menyebabkan ketidakstabilan dan kinerja yang buruk.
+
+
+3.2. Ilusi localhost: Demistifikasi Jaringan Antar-Kontainer
+
+
+Konfigurasi docker-compose.yml untuk layanan frontend menyetel variabel lingkungan NEXT_PUBLIC_BACKEND_URL: "http://localhost:8000".1 Ini adalah sumber langsung dari pesan "internal error".
+Ketika docker compose up dijalankan, Docker menciptakan sebuah jaringan virtual internal untuk aplikasi tersebut. Setiap layanan yang didefinisikan (frontend, backend, db) terhubung ke jaringan ini. Di dalam jaringan virtual ini, setiap kontainer dapat berkomunikasi dengan kontainer lain menggunakan nama layanannya sebagai nama host.13
+Kata kunci localhost (atau 127.0.0.1) di dalam sebuah kontainer selalu merujuk ke kontainer itu sendiri.14 Jadi, ketika aplikasi Next.js di dalam kontainer
+frontend mencoba melakukan panggilan API ke http://localhost:8000, ia sebenarnya mencoba terhubung ke dirinya sendiri, bukan ke kontainer backend.
+Banyak komponen dalam aplikasi ini, seperti app/page.tsx, melakukan pengambilan data sisi server (async function) saat halaman dirender.1 Panggilan
+fetch ke process.env.NEXT_PUBLIC_BACKEND_URL ini akan gagal total karena tidak ada layanan yang berjalan di localhost:8000 di dalam kontainer frontend. Kegagalan pengambilan data krusial selama proses server-side rendering (SSR) ini menyebabkan Next.js menghentikan proses render dan menampilkan halaman "internal server error" sebagai gantinya.
+Solusi yang benar adalah mengubah variabel lingkungan agar menggunakan nama layanan Docker:
+NEXT_PUBLIC_BACKEND_URL: "http://backend:8000"
+
+
+3.3. Jebakan Volume: Mengapa Pemasangan Volume Menghambat Portabilitas
+
+
+Penggunaan volumes: -.:/usr/src/app pada layanan frontend adalah teknik yang sangat efektif untuk pengembangan.1 Ini membuat direktori kode sumber pada mesin
+host "tercermin" di dalam kontainer, memungkinkan HMR berfungsi.
+Namun, untuk produksi, ini melanggar prinsip utama kontainerisasi: menciptakan artefak yang mandiri dan portabel. Sebuah image yang dibangun dengan cara ini menjadi tidak berguna tanpa direktori kode sumber asli dari mesin pengembang. Jika image ini dijalankan di server produksi, direktori /usr/src/app di dalam kontainer akan kosong, dan aplikasi tidak akan bisa berjalan.
+Praktik terbaik untuk produksi adalah menggunakan instruksi COPY di dalam Dockerfile untuk menyalin file-file yang diperlukan (kode sumber atau hasil build) ke dalam image pada saat docker build. Ini memastikan image tersebut berisi semua yang dibutuhkannya untuk berjalan secara mandiri.
+
+
+3.4. Tabel: Perbandingan Konfigurasi Docker Pengembangan vs. Produksi
+
+
+Tabel ini menyoroti perbedaan fundamental antara pendekatan saat ini dan praktik terbaik yang direkomendasikan.
+Aspek
+	Pendekatan Pengembangan (Konfigurasi Saat Ini)
+	Praktik Terbaik Produksi (Direkomendasikan)
+	Alasan
+	Tujuan
+	Iterasi cepat, live-reloading
+	Menciptakan artefak yang portabel, teroptimasi, dan aman
+	Tujuan yang berbeda memerlukan teknik yang berbeda.
+	Perintah
+	npm run dev
+	npm run build lalu npm run start
+	Server dev untuk debugging; server produksi untuk kinerja.
+	Kode Sumber
+	Dipasang dari host via volumes
+	Disalin (COPY) ke dalam image via Dockerfile
+	Image produksi harus mandiri dan tidak dapat diubah.
+	Jaringan
+	localhost (seringkali berfungsi karena pemetaan port)
+	Nama layanan (misal: http://backend:8000)
+	localhost bersifat ambigu; nama layanan dapat diandalkan di dalam jaringan Docker.
+	Ukuran Image
+	Besar (termasuk semua devDependencies)
+	Minimal (hanya dependensi produksi dan artefak build)
+	Image yang lebih kecil lebih cepat diunduh dan memiliki permukaan serangan yang lebih kecil.
+	
+
+4. Cetak Biru untuk Deployment Docker Tingkat Produksi
+
+
+Berikut adalah langkah-langkah dan artefak kode yang diperlukan untuk mengubah konfigurasi saat ini menjadi pipeline deployment Docker yang tangguh dan sesuai dengan praktik terbaik industri.
+
+
+4.1. Mengaktifkan Output Standalone Next.js
+
+
+Langkah pertama dan paling berdampak adalah mengaktifkan mode output standalone dari Next.js. Fitur ini secara cerdas menelusuri dependensi dan hanya menyalin file-file yang benar-benar diperlukan untuk menjalankan aplikasi produksi ke dalam direktori .next/standalone. Ini secara dramatis mengurangi ukuran image Docker akhir.16
+Modifikasi file next.config.mjs Anda menjadi seperti berikut:
+
+
+JavaScript
+
+
+
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+ output: 'standalone',
+};
+
+export default nextConfig;
+
+
+
+4.2. Dockerfile Produksi Multi-Tahap
+
+
+Buat file baru bernama Dockerfile di direktori root proyek Anda (di level yang sama dengan package.json). Hapus atau ganti nama Dockerfile yang mungkin sudah ada. Dockerfile ini menggunakan pendekatan multi-tahap untuk memastikan image akhir sekecil dan seaman mungkin.17
+
+
+Dockerfile
+
+
+
+
+# Tahap 1: Pemasangan Dependensi (deps)
+# Menggunakan Node.js versi LTS (Long-Term Support) dengan basis Alpine untuk ukuran yang kecil.
+FROM node:22-alpine AS deps
+WORKDIR /app
+
+# Menyalin hanya package.json dan lock file terlebih dahulu untuk memanfaatkan cache Docker.
+# Lapisan ini hanya akan dibangun ulang jika file-file ini berubah.
+COPY package.json package-lock.json* pnpm-lock.yaml*./
+RUN \
+ if [ -f pnpm-lock.yaml ]; then \
+   npm install -g pnpm && pnpm install --frozen-lockfile; \
+ elif [ -f package-lock.json ]; then \
+   npm ci; \
+ else \
+   echo "Lockfile not found." && exit 1; \
+ fi
+
+# Tahap 2: Pembangun (builder)
+# Memulai dari tahap 'deps' yang sudah memiliki node_modules.
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules./node_modules
+COPY..
+
+# Variabel lingkungan yang diperlukan saat build time.
+# Ini akan diganti dengan nilai dari docker-compose.yml.
+ARG NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+
+# Menjalankan build produksi.
+RUN npm run build
+
+# Tahap 3: Pelari (runner)
+# Memulai dari image Alpine yang bersih dan kecil untuk produksi.
+FROM node:22-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+# Menonaktifkan telemetri Next.js.
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Membuat pengguna non-root untuk keamanan.
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Menyalin output dari mode standalone yang sudah dioptimalkan.
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone./
+# Menyalin aset publik.
+COPY --from=builder --chown=nextjs:nodejs /app/public./public
+# Menyalin aset statis hasil build.
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static./.next/static
+
+# Mengatur pengguna ke non-root.
+USER nextjs
+
+# Mengekspos port yang digunakan oleh Next.js.
+EXPOSE 3000
+
+# Perintah untuk menjalankan server Next.js standalone.
+CMD ["node", "server.js"]
+
+
+
+4.3. File .dockerignore yang Esensial
+
+
+Buat file baru bernama .dockerignore di direktori root proyek Anda. File ini akan mencegah Docker menyalin file dan direktori yang tidak perlu ke dalam konteks build, mempercepat proses dan menjaga image tetap bersih.18
+
+
+
+
+
+
+# Dependensi yang akan diinstal di dalam kontainer
+node_modules
+
+# Hasil build Next.js
+.next
+
+# File lingkungan lokal
+.env
+.env.local
+.env.development
+.env.production
+
+# Log dan file sementara
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Konfigurasi IDE
+.vscode
+.idea
+
+
+
+4.4. docker-compose.yml yang Direvisi untuk Produksi
+
+
+Ganti seluruh isi file docker-compose.yml Anda dengan versi yang telah direvisi ini. Perhatikan perubahan krusial pada layanan frontend dan backend.
+
+
+YAML
+
+
+
+
+services:
+ db:
+   image: postgres:15-alpine
+   container_name: ormawa_unp_db
+   environment:
+     POSTGRES_USER: user
+     POSTGRES_PASSWORD: password
+     POSTGRES_DB: ormawa_unp
+   volumes:
+     - postgres_data:/var/lib/postgresql/data/
+   ports:
+     - "5432:5432"
+   healthcheck:
+     test:
+     interval: 10s
+     timeout: 5s
+     retries: 5
+
+ backend:
+   build:
+     context:./backend
+     dockerfile: Dockerfile
+   container_name: ormawa_unp_backend
+   # Menghapus '--reload' untuk produksi.
+   command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+   # Menghapus 'volumes' untuk produksi agar image menjadi self-contained.
+   ports:
+     - "8000:8000"
+   environment:
+     DATABASE_URL: "postgresql://user:password@db/ormawa_unp"
+     SECRET_KEY: "your-super-secret-key-change-it"
+     ALGORITHM: "HS256"
+     ACCESS_TOKEN_EXPIRE_MINUTES: 60
+   depends_on:
+     db:
+       condition: service_healthy
+
+ frontend:
+   build:
+     context:.
+     dockerfile: Dockerfile
+     args:
+       # Melewatkan variabel lingkungan ke Dockerfile saat build.
+       NEXT_PUBLIC_BACKEND_URL: http://backend:8000
+   container_name: ormawa_unp_frontend
+   # Menghapus 'command' karena sudah didefinisikan oleh CMD di Dockerfile.
+   # Menghapus 'volumes' untuk produksi.
+   ports:
+     - "3000:3000"
+   # Variabel lingkungan ini kini hanya untuk runtime jika diperlukan,
+   # yang utama adalah saat build time.
+   environment:
+     # Variabel ini masih berguna jika ada kode sisi klien yang membutuhkannya.
+     NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
+   depends_on:
+     - backend
+
+volumes:
+ postgres_data:
+
+Catatan Penting:
+      * Layanan backend: Perintah uvicorn telah diubah untuk menghapus flag --reload, dan volumes telah dihapus. Ini memastikan layanan backend juga berjalan dalam mode produksi.
+      * Layanan frontend:
+      * build.args: Ini adalah cara untuk meneruskan NEXT_PUBLIC_BACKEND_URL ke dalam Dockerfile saat proses build. Nilainya diatur ke http://backend:8000, menggunakan nama layanan yang benar.
+      * environment: NEXT_PUBLIC_BACKEND_URL di sini diatur ke http://localhost:8000. Ini akan digunakan oleh kode yang berjalan di browser klien. Dari perspektif browser, API akan diakses melalui host machine pada port 8000 yang telah dipetakan.
+
+
+4.5. Eksekusi dan Verifikasi
+
+
+Untuk membangun dan menjalankan lingkungan produksi yang baru, jalankan perintah berikut dari direktori root proyek Anda:
+
+
+Bash
+
+
+
+
+docker compose up --build -d
+
+      * --build: Memaksa Docker untuk membangun ulang image berdasarkan Dockerfile yang baru.
+      * -d: Menjalankan kontainer di latar belakang (detached mode).
+Setelah perintah selesai, periksa log layanan frontend untuk memastikan tidak ada kesalahan saat startup:
+
+
+Bash
+
+
+
+
+docker compose logs frontend
+
+Jika berhasil, Anda akan melihat output yang menunjukkan server Next.js berjalan di port 3000. Sekarang, akses http://localhost:3000 di browser Anda. Situs web seharusnya tampil dengan benar, dan semua panggilan API ke backend akan berfungsi.
+
+
+5. Ringkasan Rekomendasi Kunci dan Langkah Selanjutnya
+
+
+
+
+5.1. Daftar Periksa untuk Perbaikan Segera
+
+
+Berikut adalah ringkasan langkah-langkah yang harus diambil untuk menyelesaikan masalah saat ini:
+      1. Perbarui Dependensi: Jalankan npm install atau pnpm install untuk memperbarui paket-paket minor dan patch sesuai dengan rekomendasi pada Tabel di Bagian 2.5.
+      2. Aktifkan Mode Standalone: Ubah file next.config.mjs untuk menambahkan output: 'standalone'.
+      3. Buat Dockerfile Produksi: Buat file Dockerfile baru di root proyek dengan konten dari Bagian 4.2.
+      4. Buat .dockerignore: Buat file .dockerignore baru di root proyek dengan konten dari Bagian 4.3.
+      5. Ganti docker-compose.yml: Ganti seluruh isi docker-compose.yml dengan versi yang direvisi dari Bagian 4.4.
+      6. Refaktor Kode Frontend: Periksa seluruh basis kode frontend (terutama di dalam direktori app/ dan components/) untuk setiap penggunaan URL http://localhost:8000 yang di-hardcode. Ganti semua kemunculannya dengan process.env.NEXT_PUBLIC_BACKEND_URL. Ini memastikan kode Anda bersifat agnostik terhadap lingkungan. Contohnya pada file app/admin/[slug]/berita/page.tsx dan file serupa.
+      7. Bangun dan Jalankan: Jalankan docker compose up --build -d.
+
+
+5.2. Rekomendasi Strategis untuk Jangka Panjang
+
+
+Untuk memastikan proyek tetap sehat dan mudah dikelola di masa depan, pertimbangkan rekomendasi berikut:
+      * Pisahkan Konfigurasi Pengembangan dan Produksi: Buat file docker-compose.dev.yml yang berisi konfigurasi khusus pengembangan (pemasangan volume, perintah npm run dev). Ini memungkinkan Anda menjalankan docker compose -f docker-compose.dev.yml up untuk pengembangan dan docker compose up untuk mensimulasikan lingkungan produksi.
+      * Manajemen Rahasia (Secrets): Pindahkan semua nilai sensitif (seperti SECRET_KEY di backend) dari file docker-compose.yml ke dalam file .env yang tidak dimasukkan ke dalam kontrol versi (Git). Docker Compose secara otomatis akan memuat variabel dari file .env. Selain itu, implementasikan verifikasi JWT yang sebenarnya di middleware.ts 1 menggunakan pustaka seperti
+jsonwebtoken atau jose.
+      * Rencanakan Migrasi ke Next.js 15: Setelah aplikasi stabil dan berhasil di-deploy, buat cabang baru di Git untuk memulai proses migrasi ke Next.js 15 dan React 19. Ini akan memungkinkan Anda memanfaatkan peningkatan kinerja terbaru dari Turbopack dan fitur-fitur baru di React 19.4 Lakukan pengujian menyeluruh sebelum menggabungkannya ke cabang utama.
+
+
+==================== TUGAS IMPLEMENTASI
+
+
+Berdasarkan memorandum di atas, lakukan langkah-langkah berikut secara berurutan:
+1. Perbarui Dependensi:
+Analisis tabel di Bagian 2.5. Hasilkan dan tampilkan satu set perintah npm install yang akan memperbarui dependensi minor dan patch yang direkomendasikan. Secara spesifik, perbarui semua paket @fullcalendar/*, @radix-ui/*, lucide-react, typescript, @typescript-eslint/*, eslint, dan prettier ke versi stabil terbaru yang direkomendasikan. Jangan perbarui next atau react ke versi mayor.
+2. Konfigurasi Next.js:
+Ganti konten file next.config.mjs untuk mengaktifkan output standalone seperti yang ditentukan di Bagian 4.1. File tersebut harus berisi:javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+output: 'standalone',
+};
+export default nextConfig;
+
+3. Buat Dockerfile Produksi:
+Buat file baru bernama Dockerfile di direktori root. Kontennya harus persis seperti yang disediakan di Bagian 4.2 memorandum. Pastikan untuk menyertakan semua tiga tahap (deps, builder, runner), penggunaan pengguna non-root nextjs, dan perintah CMD yang benar.
+4. Buat File.dockerignore:
+Buat file baru bernama .dockerignore di direktori root. Kontennya harus persis seperti yang disediakan di Bagian 4.3 memorandum untuk mengecualikan file yang tidak perlu dari konteks build.
+5. Revisi docker-compose.yml:
+Ganti seluruh isi file docker-compose.yml dengan versi yang direvisi dari Bagian 4.4. Perhatikan dengan cermat perubahan pada layanan backend (menghapus --reload) dan layanan frontend (menambahkan build.args dan memperbarui environment untuk menangani NEXT_PUBLIC_BACKEND_URL dengan benar untuk konteks build dan runtime).
+6. Refaktorisasi Kode Frontend:
+Lakukan pencarian dan penggantian global. Di semua file .tsx dan .ts di dalam direktori app/ dan components/, temukan semua literal string yang sama persis dengan 'http://localhost:8000' dan ganti dengan process.env.NEXT_PUBLIC_BACKEND_URL. Ini adalah langkah penting yang disebutkan di Bagian 5.1.
+7. Sajikan Hasil:
+Sajikan konten dari semua file yang telah Anda buat atau ubah (next.config.mjs, Dockerfile, .dockerignore, docker-compose.yml) dalam blok kode terpisah untuk verifikasi. Juga, konfirmasikan bahwa Anda telah memahami tugas refaktorisasi kode.
+
+
+
